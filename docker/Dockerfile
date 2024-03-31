@@ -8,7 +8,6 @@
 # Create a stage for building the application.
 ARG GO_VERSION=latest
 FROM golang:${GO_VERSION} AS build
-WORKDIR /src
 RUN apt update && apt install sudo -y
 RUN sudo apt update && sudo apt upgrade -y
 
