@@ -8,12 +8,11 @@
 # Create a stage for building the application.
 ARG GO_VERSION=latest
 FROM golang:${GO_VERSION} AS build
+WORKDIR /src
 RUN apt update && apt install sudo -y
-RUN sudo apt update && sudo apt upgrade -y
+RUN sudo apt update && sudo apt upgrade -y && sudo apt instal -y git vim curl less 
 
-EXPOSE 8000
-
-
+COPY .. .
 
 # Download dependencies as a separate step to take advantage of Docker's caching.
 # Leverage a cache mount to /go/pkg/mod/ to speed up subsequent builds.
@@ -71,6 +70,7 @@ FROM alpine:latest AS final
 #COPY --from=build /bin/server /bin/
 
 # Expose the port that the application listens on.
+EXPOSE 8000
 
 
 # What the container should run when it is started.
