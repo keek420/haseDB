@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1
+#syntax=docker/dockerfile:1
 
 # Comments are provided throughout this file to help you get started.
 # If you need more help, visit the Dockerfile reference guide at
@@ -6,13 +6,27 @@
 
 ################################################################################
 # Create a stage for building the application.
-ARG GO_VERSION=latest
-FROM golang:${GO_VERSION} AS build
-WORKDIR /src
-RUN apt update && apt install sudo -y
-RUN sudo apt update && sudo apt upgrade -y && sudo apt instal -y git vim curl less 
 
-COPY .. .
+FROM ubuntu:22.04
+
+RUN apt update && apt install sudo -y
+RUN  sudo apt install -y git vim curl less git wget gcc make
+RUN sudo apt-get install -y golang && echo "hello"
+
+
+# Goをダウンロードしてインストールします
+ENV GOLANG_VERSION 1.17.3
+# RUN wget https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz && \
+#     tar -C /usr/local -xzf go$GOLANG_VERSION.linux-amd64.tar.gz && \
+#     rm go$GOLANG_VERSION.linux-amd64.tar.gz
+# 
+COPY .. ./
+
+# Goのパスを環境変数に追加します
+ENV PATH $PATH:/usr/local/go/bin
+
+# コンテナの起動時にbashを起動します
+CMD ["bash"]
 
 # Download dependencies as a separate step to take advantage of Docker's caching.
 # Leverage a cache mount to /go/pkg/mod/ to speed up subsequent builds.
@@ -42,8 +56,6 @@ COPY .. .
 # most recent version of that image when you build your Dockerfile. If
 # reproducability is important, consider using a versioned tag
 # (e.g., alpine:3.17.2) or SHA (e.g., alpine@sha256:c41ab5c992deb4fe7e5da09f67a8804a46bd0592bfdf0b1847dde0e0889d2bff).
-FROM alpine:latest AS final
-
 # Install any runtime dependencies that are needed to run your application.
 # Leverage a cache mount to /var/cache/apk/ to speed up subsequent builds.
 #JRUN --mount=type=cache,target=/var/cache/apk \
@@ -70,7 +82,6 @@ FROM alpine:latest AS final
 #COPY --from=build /bin/server /bin/
 
 # Expose the port that the application listens on.
-EXPOSE 8000
 
 
 # What the container should run when it is started.
